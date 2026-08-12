@@ -61,7 +61,7 @@ tar_assign({
 
   acs_data = "./input/acs_state_cps_2025_dist.dta" |>
     prepare_acs_microdata() |>
-    filter(pwstate == 2) |> #### UPDATE THIS FOR EACH STATE MW ####
+    filter(pwstate == 11) |> #### UPDATE THIS FOR EACH STATE MW ####
     create_parquet("./input/acs_state_cps_2025.parquet") |>    # read in with haven, convert to parquet w arrow
     tar_parquet_read()
 
@@ -72,8 +72,8 @@ tar_assign({
   policy_schedule = tibble( #### UPDATE THIS FOR EACH STATE MW ####
     step = 0:1,
     date = seq(ymd("2025 July 1"), ymd("2026 July 1"), by = "1 year"),
-    new_mw = c(NA, 14.00),
-    new_tw = c(NA, 14.00)
+    new_mw = c(NA, 18.40),
+    new_tw = c(NA, 10.30)
   ) |>
     tar_target()
 
