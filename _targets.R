@@ -1,3 +1,6 @@
+#tar_load_globals() #-- targets shortcuts incoming from ben
+# tar_workspace() an errored target 
+
 source("packages.R")
 tar_source()
 
@@ -52,7 +55,7 @@ tar_assign({
     tar_target()
 
   step_wage_projections = eci_policy_projections |>
-    filter(year(date) %in% 2025:2026) |> #### UPDATE THIS EVERY YEAR ####
+    filter(year(date) %in% 2025:2030) |> #### UPDATE THIS EVERY YEAR ####
     arrange(date) |>
     mutate(step = row_number() - 1) |>
     mutate(cf_nominal_wage_growth = eci / lag(eci) - 1) |>
@@ -61,7 +64,7 @@ tar_assign({
 
   acs_data = "./input/acs_state_cps_2025_dist.dta" |>
     prepare_acs_microdata() |>
-    filter(pwstate == 11) |> #### UPDATE THIS FOR EACH STATE MW ####
+    filter(pwstate == 48) |> #### UPDATE THIS FOR EACH STATE MW #### #statefips for south: 12,13,37,45,51,54,1,21,28,47,5,22,40,48
     create_parquet("./input/acs_state_cps_2025.parquet") |>    # read in with haven, convert to parquet w arrow
     tar_parquet_read()
 
@@ -70,10 +73,10 @@ tar_assign({
     tar_target()
 
   policy_schedule = tibble( #### UPDATE THIS FOR EACH STATE MW ####
-    step = 0:1,
-    date = seq(ymd("2025 July 1"), ymd("2026 July 1"), by = "1 year"),
-    new_mw = c(NA, 18.40),
-    new_tw = c(NA, 10.30)
+    step = 0:5,
+    date = seq(ymd("2025 July 1"), ymd("2030 July 1"), by = "1 year"),
+    new_mw = c(NA, 12.00, 13.50, 15.50, 17.50, 20),
+    new_tw = c(NA, 12.00, 13.50, 15.50, 17.50, 20)
   ) |>
     tar_target()
 
@@ -95,16 +98,16 @@ tar_assign({
   mw_simulation = mw_simulate(
     acs_data, ## ask Ben how to generate this (use Stata output for now)
     policy_schedule = policy_schedule,
-    state_mw = state_mw_baseline, #normally state_mw_projections
+    state_mw = state_mw_projections, #normally state_mw_projections; state_mw_baseline works for pre-planned
     wage_growth = step_wage_projections,
     population_projections = population_projections
   ) |>
     tar_parquet()
 
   cpi_deflator = cbo_cpi_annual_projections |> #### UPDATE THIS EACH YEAR ####
-    filter(year %in% c(2025,2026)) |>
+    filter(year %in% c(2026, 2030)) |>
     pivot_wider(names_from = year, names_prefix = "cpi", values_from = cpi) |>
-    mutate(deflator = cpi2025 / cpi2026) |>
+    mutate(deflator = cpi2026 / cpi2030) |>
     pull(deflator) |>
     tar_target()
 

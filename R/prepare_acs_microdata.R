@@ -16,7 +16,11 @@ prepare_acs_microdata <- function(file) {
       worker = age >= 16 &
         !is.na(hrwage) & hrwage > 0 &
         classwkrd >= 22 & classwkrd <= 28 &
-        empstatd >= 10 & empstatd <= 12
+        empstatd >= 10 & empstatd <= 12,
+      region = case_when(
+        pwstate %in% c(12,13,37,45,51,54,1,21,28,47,5,22,40,48) ~ "South",
+        TRUE ~ "not South"
+      )
     ) |>
     filter(worker) |>
     mutate(
