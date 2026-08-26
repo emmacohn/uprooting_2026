@@ -64,13 +64,14 @@ tar_assign({
 
   acs_data = "./input/acs_state_cps_2025_dist.dta" |>
     prepare_acs_microdata() |>
-    filter(pwstate == 48) |> #### UPDATE THIS FOR EACH STATE MW #### #statefips for south: 12,13,37,45,51,54,1,21,28,47,5,22,40,48
+    filter(region == "South") |> #### UPDATE THIS FOR EACH STATE MW ## region == "South"; pwstate == x
     create_parquet("./input/acs_state_cps_2025.parquet") |>    # read in with haven, convert to parquet w arrow
     tar_parquet_read()
 
-  state_abb = acs_data |>
-    derive_state_abb() |>
-    tar_target()
+  ### comment out when doing region
+  #state_abb = acs_data |>
+  #  derive_state_abb() |>
+  #  tar_target()
 
   policy_schedule = tibble( #### UPDATE THIS FOR EACH STATE MW ####
     step = 0:5,
@@ -121,7 +122,9 @@ tar_assign({
   state_summary_results = make_state_summary_table(
     mw_simulation,
     cpi_deflator,
-    paste0("output/", state_abb, "_table_1.csv")
+    paste0("output/", 
+   # state_abb, ##comment out if using region instead of pwstate
+    "south_table_1_v2.csv")
   ) |>
     tar_csv_read()
 
