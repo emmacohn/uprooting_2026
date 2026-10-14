@@ -62,11 +62,18 @@ tar_assign({
     select(step, date, cf_nominal_wage_growth) |>
     tar_target()
 
-  acs_data = "./input/acs_state_cps_2025_dist.dta" |>
-    prepare_acs_microdata() |>
-    filter(region == "South") |> #### UPDATE THIS FOR EACH STATE MW ## region == "South"; pwstate == x
-    create_parquet("./input/acs_state_cps_2025.parquet") |>    # read in with haven, convert to parquet w arrow
+  #acs_data = "./input/acs_state_cps_2025_dist.dta" |>
+  #  prepare_acs_microdata() |>
+  #  filter(region == "South") |> #### UPDATE THIS FOR EACH STATE MW ## region == "South"; pwstate == x
+  #  create_parquet("./input/clean_acs_state_base.parquet") |>  
+  #  tar_parquet_read()
+
+  acs_data_all = "/projects/ecohn/min_wage_new/acs_min_wage_prep/inputs_clean/clean_acs_state_base.parquet" |>
     tar_parquet_read()
+
+  acs_data = acs_data_all |>
+    filter(region == 1) |> #### UPDATE THIS FOR EACH STATE MW ## region == 1 (South); pwstate == x
+    tar_target()
 
   ### comment out when doing region
   #state_abb = acs_data |>
@@ -124,7 +131,7 @@ tar_assign({
     cpi_deflator,
     paste0("output/", 
    # state_abb, ##comment out if using region instead of pwstate
-    "south_table_1_v2.csv")
+    "south_table_1_v3.csv")
   ) |>
     tar_csv_read()
 

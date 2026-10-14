@@ -9,7 +9,7 @@ suppression_thresholds <- list( ## may want to edit this
   min_share_affected = 0.006,
   min_total_directly_affected = 500,
   min_share_directly_affected = 0.003,
-  min_total_indirectly_affected = 250,
+  min_total_indirectly_affected = 500,
   min_share_indirectly_affected = 0.003,
   min_n_workforce = 1500,
   min_n_affected = 500
